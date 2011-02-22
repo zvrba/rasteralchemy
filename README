@@ -1,0 +1,16 @@
+Height field generator. The documentation, including short build instructions
+and dependencies, is provided in the file rasteralchemy.info. 
+
+COPYRIGHT:
+
+I am the original author of the following files:
+
+  GLRasterCanvas.h and GLRasterCanvas.cc
+  GLRasterViewer.h and GLRasterViewer.cc
+  
+and I release them under the GNU LGPL (see COPYING.LIB). All other files are
+released under GNU GPL (see COPYING). For further information contact me at
+zvrba@globalnet.hr.
+
+Source files without the copyright notice are originally copyrighted under the
+GNU GPL by John P. Beale.

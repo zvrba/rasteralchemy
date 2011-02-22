@@ -1,0 +1,287 @@
+This is rasteralchemy.info, produced by makeinfo version 4.7 from
+rasteralchemy.texi.
+
+
+File: rasteralchemy.info,  Node: Top,  Next: Introduction and features,  Prev: (dir),  Up: (dir)
+
+Raster Alchemy
+**************
+
+This manual documents version 1.0 of the Raster Alchemy program.  (C)
+2004 Z<eljko Vrba. All programs are licensed free of charge, with NO
+WARRANTY, under GNU General Public License Version 2.
+
+   You can contact me at the following e-mail addresses:
+
+     zvrba@globalnet.hr
+     mordor@fly.srk.fer.hr
+
+* Menu:
+
+* Introduction and features::
+* Prerequisites and building::
+* Usage::
+
+
+File: rasteralchemy.info,  Node: Introduction and features,  Next: Prerequisites and building,  Prev: Top,  Up: Top
+
+Introduction and features
+*************************
+
+This is yet another height field generator with flat OpenGL display.
+The code contains a substantial copy of the original "Height Field Lab"
+program written by John P. Beale. He released his code under GNU GPL
+version 2. I cleaned up the code, embedded a "nicer" language
+interpreter (Lua), and developed the OpenGL display. The latter was the
+real incentive - Height Field Lab has crashed very often when
+displaying the generated heightfields.
+
+   Instead of Lua I would have rather used Onyx (very nice stack-based
+language).  RPN languages are more adapted for interactive work. Sadly,
+Onyx is tightly bound to POSIX platforms, and one day I plan to port
+this program to Win32.  And Lua has a really nice and clean C API and
+excellent C++ binding in the form of luabind.
+
+   The name of the program itself is derived from the old DOS program
+called "Image Alchemy".
+
+   This version features:
+
+   * Graphical user interface, written in FOX, to display the generated
+     images (only in 2D for now).
+
+   * Coloured display of complex (real and imaginary part) images.
+
+   * Embedded real programming language, Lua, for manipulating images.
+
+   * More user-friendly interactive mode.
+
+   * Image saving in ILM's EXR format.
+
+   Future plans (when I find the time):
+
+   * 3D graphical preview.
+
+   * Export to other formats (Povray mesh, or POT (16-bit GIF first
+     used in FractInt)).
+
+   * Procedural color map assignment (programmable in Lua).
+
+   * Other 2D image routines not directly tied to height fields. This
+     includes color RGB images.
+
+
+File: rasteralchemy.info,  Node: Prerequisites and building,  Next: Usage,  Prev: Introduction and features,  Up: Top
+
+1 Prerequisites and building
+****************************
+
+This program is distributed in source form. Before building make sure
+that you have all of these programs and libraries installed and ready
+for use:
+
+   * Lua version 5: `http://www.lua.org'.
+
+   * Boost C++ libraries: `http://www.boost.org'
+
+   * luabind: `http://luabind.sourceforge.net'
+
+   * FOX GUI toolkit. Use version from 1.0 series! This program was
+     compiled and tested with version 1.0.40. Available from
+     `http://www.fox-toolkit.org'.
+
+   * OpenEXR: `http://www.openexr.net'. This program was compiled with
+     version 1.0.6. Maybe it will work with the now (September
+     2004)-current version 1.2.  It makes handling multi-channel and
+     floating-point images really easy.
+
+   * readline library.
+
+   I am also providing a statically-linked i386 Linux binary on the
+same site as the source.
+
+   *Win32 compatibility note:* All of these libraries are also
+available on the Win32 platform! However, I have used pthreads to make
+possible for the user to enter commands in an xterm and manipulate the
+display at the same time. If this part is replaced with a FOX-based
+console window (or pthreads code ported to Win32 console), then it
+should be possible to build this program for Win32. *Please notify me
+if you succeed in doing this!* Alternatively, it could be possibly
+built using Cygwin.
+
+   Make process needs GNU make! Adjust include and library directories
+in the make file. Be sure to include paths to all needed libraries! When
+done, just execute "make" (or "gmake" on some systems).
+
+
+File: rasteralchemy.info,  Node: Usage,  Prev: Prerequisites and building,  Up: Top
+
+2 Usage
+*******
+
+This chapter describes the usage of features specific to this program.
+The program has a built-in help for each command whose text was
+directly taken from Height Field Lab help file (with minor
+modifications).
+
+* Menu:
+
+* Interactive mode::
+* Image objects::
+* Variables::
+* Storing height fields::
+* Displaying height fields::
+
+
+File: rasteralchemy.info,  Node: Interactive mode,  Next: Image objects,  Prev: Usage,  Up: Usage
+
+2.1 Interactive mode
+====================
+
+Typing `help()' in the terminal will list availabe commands. Typing
+`help('command')' will give the help for the specific command. Commands
+are given with a short synopsis. Arguments named `HF', `HFX', `X',
+`HFY' and `Y' represent _height fields_. Other arguments stand for
+ordinary real numbers. Default argument values are given in square
+brackets for each command. *Note* that all commands must be preceded by
+`hf.' before invocation (but _not_ in the `help()' function).
+
+   An example:
+
+     bloom HFX HFY [SCALE=1.0] [XCENT=0.5] [YCENT=XCENT]
+
+   This command can be explicitly called as `hf.bloom(I001, I002)', or
+as `hf.bloom(I001, I002, 0.9)'. Note that arguments can be omitted and
+they will then take their specified defaults (here `I001' and `I002'
+stand for variables containing height fields).
+
+   Every command also has a user-friendly mode: typing just `hf.bloom()'
+will display the help for the command and then the user is prompted for
+each argument value. Default (if any) is displayed in square brackets
+and if the user wants to accept the default, he can just hit ENTER.
+
+   The `images()' command will display all current image objects. The
+`reset()' command will destroy (and free memory) all current images.
+
+
+File: rasteralchemy.info,  Node: Image objects,  Next: Variables,  Prev: Interactive mode,  Up: Usage
+
+2.2 Image objects
+=================
+
+Each function returns an image as a result. The variable used to store
+the function result is displayed after the function is executed. The
+generated names always have the form `I___' where `___' stands for 3
+decimal digits.
+
+   One image object can't be assigned to more than one variable. If
+something like `A=hf.gforge(256)' is executed, then the program will
+display a message that `I001' has been renamed to `A'. It is important
+to know that after renaming, the variable `I001' _does not exist any
+longer_; i.e. its value is `nil'.
+
+   Self-assignment is handled gracefully (some functions modify its
+input image and return it as the result).
+
+   Each image has defined the following attributes: `width', `height';
+`min', `max' (minimum and maximum value in the picutre); `cplx' (1 if
+the image is complex-valued, 0 else).
+
+   For example,
+
+     print(I001.width)
+
+   will print the width of image `I001'.
+
+
+File: rasteralchemy.info,  Node: Variables,  Next: Storing height fields,  Prev: Image objects,  Up: Usage
+
+2.3 Variables
+=============
+
+There are some variables controlling the HF functions. They are stored
+in the `hf.PARAMS' table. Current variable values can be displayed by
+the `showvar()' command. Specifying the exact variable name (e.g.
+`showvar('tile_tol')' will display the help for the variable and its
+value.
+
+   The variable value can be changed by simple assignment to the table,
+e.g.  `hf.PARAMS['tile_tol']=0.02'.
+
+   Also two global variables, `PI' and `E', are defined to stand for
+the well-known mathematical constants.
+
+
+File: rasteralchemy.info,  Node: Storing height fields,  Next: Displaying height fields,  Prev: Variables,  Up: Usage
+
+2.4 Storing height fields
+=========================
+
+For saving and loading images the functions `hf.save()' and `hf.load()'
+are provided. The height fields are saved in EXR format with 32-bit
+floating-point values. Real height fields have one channel named `H'
+while complex height fields have two channels named `RE' and `IM'.
+
+
+File: rasteralchemy.info,  Node: Displaying height fields,  Prev: Storing height fields,  Up: Usage
+
+2.5 Displaying height fields
+============================
+
+The program defines one global _object_ named `RasterWindow'. It is
+used to set images, as in `RasterWindow:setImage(I001)'(1) where `I001'
+is the variable holding the height field.
+
+   The height field is displayed in the separate image window. The
+windows offers two menus for controlling the display:
+
+   * Display menu is the main display control.
+
+        - When the contrast for a channel is turned on, then channel
+          values are adjusted to the normalized range [0,1] before
+          display. Otherwise the true values are displayed.
+
+        - Rectangular/Polar are mutually exclusive toggles and have
+          effect only on complex images. In rectangular mode, channel 1
+          is real part, and channel 2 is imaginary part. In polar mode,
+          channel 1 is magnitude, and channel 2 is phase.  Phase is in
+          the range [-\pi/2, \pi/2].
+
+   * Complex menu controls the display of complex images.
+
+        - Channel 1/Channel 2 are mutually exclusive toggles that show
+          only one channel of the complex image.
+
+        - RGB/HSV submenus display both parts of the complex image
+          simultaneously, either in RGB or HSV mode. The numbers in
+          parentheses are assignments of complex parts to color
+          components. 0 is complex channel 1, 1 is complex channel 2 and
+          2 is constant channel value.
+
+        - Constant channel value sets the color constant for color
+          component numbered 2 in RGB/HSV menus. Since the complex
+          image has only two components, and color images have 3
+          components, the 3rd component is always made constant and
+          equals the value set by this parameter (which should be in
+          range [0,1]).
+
+
+   ---------- Footnotes ----------
+
+   (1) This is standard Lua syntax for method invocation on objects.
+
+
+
+Tag Table:
+Node: Top87
+Node: Introduction and features603
+Node: Prerequisites and building2329
+Node: Usage4026
+Node: Interactive mode4459
+Node: Image objects5836
+Node: Variables6890
+Node: Storing height fields7531
+Node: Displaying height fields7982
+Ref: Displaying height fields-Footnote-19905
+
+End Tag Table
